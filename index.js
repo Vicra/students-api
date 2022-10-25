@@ -13,9 +13,27 @@ app.get('/alumno', async function (_, res) {
     res.send(students);
 });
 
-app.post('/alumno', function (req, res) {
-    const alumno = req.body;
+app.get('/alumno/:id', async function (req, res) {
+    // validations
+    const { id } = req.params;
+    const user = await studentsService.getStudentById(id);
+    if (user.length)
+        res.send(user[0]);
+});
+
+app.delete('/alumno/:id', async function (req, res) {
+    // validations
+    const { id } = req.params;
+    await studentsService.deleteStudentById(id);
     res.send({});
 });
+
+app.post('/alumno', function (req, res) {
+    const alumno = req.body;
+    studentsService.createStudent(alumno);
+    res.send({});
+});
+
+
 
 app.listen(3000);

@@ -36,13 +36,34 @@ async function getStudents() {
 
 // TODO: create student
 async function createStudent(student) {
-
+    return knex('students').insert({
+        name: student.name
+    });
 }
 
 // TODO: crud
 
+async function getStudentById(id) {
+    const student = JSON.parse(
+        JSON.stringify(
+            await knex.select()
+                .table('students')
+                .where('id', id)
+        )
+    );
+    return student;
+}
+
+async function deleteStudentById(id) {
+    return await knex('students')
+        .where('id', id)
+        .del();
+}
 
 // exposure to outside
 module.exports = {
-    getStudents
+    getStudents,
+    getStudentById,
+    deleteStudentById,
+    createStudent
 };
