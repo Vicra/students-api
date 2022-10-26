@@ -9,7 +9,6 @@ const knex = require('knex')({
     }
 });
 
-// TODO: get
 async function getStudents() {
     const students = JSON.parse(
         JSON.stringify(
@@ -18,30 +17,40 @@ async function getStudents() {
         )
     );
     const studentsReturn = students.slice();
-    students.map(async (student, index) => {
-        students[index].classes = JSON.parse(JSON.stringify(await knex.select()
-            .table('students_classes')
-            .where('student_id', student.id)));
-
-        students[index].classes.forEach(async (e) => {
-            const classes = JSON.parse(JSON.stringify(await knex.select()
-                .table('classes')
-                .where('id', e.class_id)));
-            console.log(classes);
-            studentsReturn[index].classes = classes;
-        });
-    });
+    for (let i = 0; i < students.length; i++) {
+        const student = students[i];
+        const classes = await getEnrolledClasses(student.id);
+        studentsReturn[i].classes = classes;
+    }
     return studentsReturn;
 }
 
-// TODO: create student
-async function createStudent(student) {
-    return knex('students').insert({
-        name: student.name
-    });
+async function getEnrolledClasses(studentId) {
+    const classes = [];
+    const studentsClasses = JSON.parse(JSON.stringify(await knex.select()
+        .table('students_classes')
+        .where('student_id', studentId)));
+
+    for (let i = 0; i < studentsClasses.length; i++) {
+        const enrolledClass = JSON.parse(
+            JSON.stringify(
+                await knex.select()
+                    .table('classes')
+                    .where('id', studentsClasses[i].class_id)
+            )
+        );
+        if (enrolledClass.length)
+            classes.push(enrolledClass[0].name);
+    }
+    return classes;
 }
 
-// TODO: crud
+async function createStudent(student) {
+    return knex('students').insert({
+        name: student.name,
+        age: student.age ? student.age : null
+    });
+}
 
 async function getStudentById(id) {
     const student = JSON.parse(
@@ -60,10 +69,21 @@ async function deleteStudentById(id) {
         .del();
 }
 
+async function updateStudent(id, student) {
+    await knex('students')
+        .where('id', '=', id)
+        .update({
+            name: student.name,
+            age: student.age
+        });
+    return;
+}
+
 // exposure to outside
 module.exports = {
     getStudents,
     getStudentById,
     deleteStudentById,
-    createStudent
+    createStudent,
+    updateStudent
 };

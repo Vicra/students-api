@@ -28,6 +28,19 @@ app.delete('/alumno/:id', async function (req, res) {
     res.send({});
 });
 
+app.put('/alumno/:id', async function (req, res) {
+    // parametros
+    const { id } = req.params;
+    const student = req.body;
+
+    //validar parametros
+
+    // llamado a bd actualizar
+    await studentsService.updateStudent(id, student);
+
+    res.status(204).send();
+});
+
 app.post('/alumno', function (req, res) {
     const alumno = req.body;
     studentsService.createStudent(alumno);
