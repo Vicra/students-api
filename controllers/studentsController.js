@@ -1,32 +1,34 @@
-const studentsService = require("../services/students");
-const { IsNumeric } = require("../utils/validator");
+const {
+    getStudents
+    , getStudentById
+    , deleteStudentById
+    , updateStudent
+    , createStudent
+} = require("../services/students");
+
+const { isDecimal } = require("../utils/validator");
+
 async function getStudents(_, res) {
-    const students = await studentsService.getStudents();
+    const students = await getStudents();
     //TODO: mostrar clases en las que esta matriculado
     res.send(students);
 }
 
 async function getStudentById(req, res) {
-    // try catch
-
-    // validations of parameters
-
-    // call to db (action)
-
     try {
         const { id } = req.params;
         const errorMessages = [];
         if (!id) {
             errorMessages.push("Parameter 'id' is required");
         }
-        if (IsNumeric(id)) {
+        if (isDecimal(id)) {
             errorMessages.push("Parameter 'id' needs to be an integer");
         }
 
         if (errorMessages.length) {
             res.status(400).send(errorMessages);
         } else {
-            const student = await studentsService.getStudentById(id);
+            const student = await getStudentById(id);
             if (student.length)
                 res.send(student[0]);
             else {
@@ -35,10 +37,33 @@ async function getStudentById(req, res) {
         }
 
     } catch (exception) {
-        // logs
+        res.status(500).send("internal server error");
+    }
+}
 
-        // alerts
+async function getStudentById2(req, res) {
+    try {
+        const { id } = req.query;
+        const errorMessages = [];
+        if (!id) {
+            errorMessages.push("Parameter 'id' is required");
+        }
+        if (isDecimal(id)) {
+            errorMessages.push("Parameter 'id' needs to be an integer");
+        }
 
+        if (errorMessages.length) {
+            res.status(400).send(errorMessages);
+        } else {
+            const student = await getStudentById(id);
+            if (student.length)
+                res.send(student[0]);
+            else {
+                res.status(404).send("student does not exist");
+            }
+        }
+
+    } catch (exception) {
         res.status(500).send("internal server error");
     }
 }
@@ -46,7 +71,7 @@ async function getStudentById(req, res) {
 async function deleteStudentById(req, res) {
     // validations
     const { id } = req.params;
-    await studentsService.deleteStudentById(id);
+    await deleteStudentById(id);
     res.send({});
 }
 
@@ -58,20 +83,21 @@ async function updateStudent(req, res) {
     //validar parametros
 
     // llamado a bd actualizar
-    await studentsService.updateStudent(id, student);
+    await updateStudent(id, student);
 
     res.status(204).send();
 }
 
 function createStudent(req, res) {
     const alumno = req.body;
-    studentsService.createStudent(alumno);
+    createStudent(alumno);
     res.send({});
 }
 
 module.exports = {
     getStudents,
     getStudentById,
+    getStudentById2,
     deleteStudentById,
     updateStudent,
     createStudent

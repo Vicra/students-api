@@ -1,6 +1,6 @@
-function IsNumeric(input) {
-    var RE = /^-{0,1}\d*\.{0,1}\d+$/;
-    return (RE.test(input));
+function isDecimal(input) {
+    let regex = /^[-+]?[0-9]+\.[0-9]+$/;
+    return (regex.test(input));
 }
 
 function IsEmail(email) {
@@ -13,7 +13,7 @@ function IsString(string) {
 }
 
 module.exports = {
-    IsNumeric,
+    isDecimal,
     IsEmail,
     IsString
 };

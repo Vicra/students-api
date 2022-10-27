@@ -5,6 +5,7 @@ const studentController = require("../controllers/studentsController");
 
 // enlace de routes
 router.get('/', studentController.getStudents);
+router.get('/getById', studentController.getStudentById2);
 router.get('/:id', studentController.getStudentById);
 router.delete('/:id', studentController.deleteStudentById);
 router.put('/:id', studentController.updateStudent);
