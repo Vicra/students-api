@@ -3,8 +3,8 @@ const knex = require('knex')({
     connection: {
         host: '127.0.0.1',
         port: 3306,
-        user: 'victor',
-        password: 'abc123**',
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
         database: 'studentsdb'
     }
 });
