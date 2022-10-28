@@ -1,15 +1,15 @@
 const {
-    getStudents
-    , getStudentById
-    , deleteStudentById
-    , updateStudent
-    , createStudent
+    getStudents: get
+    , getStudentById: getById
+    , deleteStudentById: deleteById
+    , updateStudent: update
+    , createStudent: create
 } = require("../services/students");
 
 const { isDecimal } = require("../utils/validator");
 
 async function getStudents(_, res) {
-    const students = await getStudents();
+    const students = await get();
     //TODO: mostrar clases en las que esta matriculado
     res.send(students);
 }
@@ -28,7 +28,7 @@ async function getStudentById(req, res) {
         if (errorMessages.length) {
             res.status(400).send(errorMessages);
         } else {
-            const student = await getStudentById(id);
+            const student = await getById(id);
             if (student.length)
                 res.send(student[0]);
             else {
@@ -55,7 +55,7 @@ async function getStudentById2(req, res) {
         if (errorMessages.length) {
             res.status(400).send(errorMessages);
         } else {
-            const student = await getStudentById(id);
+            const student = await getById(id);
             if (student.length)
                 res.send(student[0]);
             else {
@@ -71,7 +71,7 @@ async function getStudentById2(req, res) {
 async function deleteStudentById(req, res) {
     // validations
     const { id } = req.params;
-    await deleteStudentById(id);
+    await deleteById(id);
     res.send({});
 }
 
@@ -83,15 +83,20 @@ async function updateStudent(req, res) {
     //validar parametros
 
     // llamado a bd actualizar
-    await updateStudent(id, student);
+    await update(id, student);
 
     res.status(204).send();
 }
 
-function createStudent(req, res) {
+async function createStudent(req, res) {
     const alumno = req.body;
-    createStudent(alumno);
-    res.send({});
+    const created = await create(alumno);
+    if (created) {
+        res.send({ id: created[0] });
+    } else {
+        res.send("Unable to create");
+    }
+
 }
 
 module.exports = {
