@@ -5,13 +5,22 @@ const {
     , updateStudent: update
     , createStudent: create
 } = require("../services/students");
+const { successResponse, badRequestResponse } = require("../utils/responseBuilder");
+
+const HTTPCodes = {
+    OK: 200,
+    CREATED: 201,
+    UPDATED: 204,
+    BAD_REQUEST: 400,
+    NOT_FOUND: 404,
+    INTERNAL_SERVER_ERROR: 500
+};
 
 const { isDecimal } = require("../utils/validator");
 
 async function getStudents(_, res) {
     const students = await get();
-    //TODO: mostrar clases en las que esta matriculado
-    res.send(students);
+    res.send(successResponse(students));
 }
 
 async function getStudentById(req, res) {
@@ -26,13 +35,15 @@ async function getStudentById(req, res) {
         }
 
         if (errorMessages.length) {
-            res.status(400).send(errorMessages);
+            res.status(HTTPCodes.BAD_REQUEST).send(errorMessages);
         } else {
             const student = await getById(id);
             if (student.length)
-                res.send(student[0]);
+                res.status(HTTPCodes.OK).send(student[0]);
             else {
-                res.status(404).send("student does not exist");
+                res.status(HTTPCodes.NOT_FOUND).send(
+                    badRequestResponse("student does not exist",
+                        HTTPCodes.NOT_FOUND));
             }
         }
 
