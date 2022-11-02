@@ -12,8 +12,14 @@ function IsString(string) {
     return typeof string === "string";
 }
 
+function IsPassword(string) {
+    const regex = /^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,16}$/;
+    return (regex.test(string));
+}
+
 module.exports = {
     isDecimal,
     IsEmail,
-    IsString
+    IsString,
+    IsPassword
 };

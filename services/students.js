@@ -9,6 +9,16 @@ const knex = require('knex')({
     }
 });
 
+async function register(student) {
+    return knex('students').insert({
+        name: student.name,
+        age: student.age ? student.age : null,
+        email: student.email,
+        password: student.encryptedPassword,
+        salt: student.salt
+    });
+}
+
 async function getStudents() {
     const students = JSON.parse(
         JSON.stringify(
@@ -85,5 +95,6 @@ module.exports = {
     getStudentById,
     deleteStudentById,
     createStudent,
-    updateStudent
+    updateStudent,
+    register
 };

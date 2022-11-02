@@ -3,9 +3,13 @@ const {
     , getStudentById: getById
     , deleteStudentById: deleteById
     , updateStudent: update
-    , createStudent: create
+    , createStudent: create,
+    register
 } = require("../services/students");
 const { successResponse, badRequestResponse } = require("../utils/responseBuilder");
+
+const { IsEmail, IsPassword } = require("../utils/validator");
+const crypto = require("crypto");
 
 const HTTPCodes = {
     OK: 200,
@@ -17,6 +21,62 @@ const HTTPCodes = {
 };
 
 const { isDecimal } = require("../utils/validator");
+
+async function registerStudent(req, res) {
+    const { email, password, name, age } = req.body;
+    // validations
+    const errorMessages = [];
+    if (!email) {
+        errorMessages.push("Parameter 'email' is required");
+    }
+    else if (!IsEmail(email)) {
+        errorMessages.push("Invalid 'email' format");
+    }
+
+    if (!password) {
+        errorMessages.push("Parameter 'password' is required");
+    }
+    if (!IsPassword(password)) {
+        errorMessages.push("Invalid 'password' format");
+    }
+
+    if (!name) {
+        errorMessages.push("Parameter 'name' is required");
+    }
+    if (typeof name !== "string") {
+        errorMessages.push("Invalid 'name' type");
+    }
+
+    if (age && isNaN(age)) {
+        errorMessages.push("Parameter 'age' needs to be a numeric value");
+    }
+
+    if (errorMessages.length) {
+        res.status(HTTPCodes.BAD_REQUEST).send(badRequestResponse(errorMessages));
+    } else {
+        // action
+        const salt = crypto.randomBytes(128).toString('base64');
+        const encryptedPassword = crypto.pbkdf2Sync(password, salt, parseInt(process.env.HASH_ITERATIONS), parseInt(process.env.KEY_LENGTH), "sha256").toString('base64');
+
+        // call to db
+        /*
+        const student = req.body;
+        student.salt = salt;
+        student.encryptedPassword = encryptedPassword;
+         
+        este y el de abajo somos lo mismo
+        */
+
+        const student2 = {
+            ...req.body,
+            salt,
+            encryptedPassword
+        };
+
+        const studentId = register(student2);
+        res.send(successResponse(studentId));
+    }
+}
 
 async function getStudents(_, res) {
     const students = await get();
@@ -116,5 +176,6 @@ module.exports = {
     getStudentById2,
     deleteStudentById,
     updateStudent,
-    createStudent
+    createStudent,
+    registerStudent
 };

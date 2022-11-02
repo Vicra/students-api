@@ -11,4 +11,7 @@ router.delete('/:id', studentController.deleteStudentById);
 router.put('/:id', studentController.updateStudent);
 router.post('/', studentController.createStudent);
 
+// auth
+router.post('/register', studentController.registerStudent);
+
 module.exports = router;
