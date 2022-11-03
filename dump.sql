@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `ecomm` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `ecomm`;
+CREATE DATABASE  IF NOT EXISTS `studentsdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `studentsdb`;
 -- MySQL dump 10.13  Distrib 8.0.25, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: ecomm
+-- Host: 127.0.0.1    Database: studentsdb
 -- ------------------------------------------------------
 -- Server version	8.0.25
 
@@ -18,200 +18,87 @@ USE `ecomm`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `addresses`
+-- Table structure for table `classes`
 --
 
-DROP TABLE IF EXISTS `addresses`;
+DROP TABLE IF EXISTS `classes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `addresses` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `street` varchar(100) NOT NULL,
-  `city` varchar(45) NOT NULL,
-  `state` varchar(45) NOT NULL,
-  `zipcode` varchar(45) NOT NULL,
-  `phone` varchar(45) DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `fk_user_id_users_idx` (`user_id`),
-  CONSTRAINT `fk_user_id_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `addresses`
---
-
-LOCK TABLES `addresses` WRITE;
-/*!40000 ALTER TABLE `addresses` DISABLE KEYS */;
-/*!40000 ALTER TABLE `addresses` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `brands`
---
-
-DROP TABLE IF EXISTS `brands`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `brands` (
+CREATE TABLE `classes` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `brands`
---
-
-LOCK TABLES `brands` WRITE;
-/*!40000 ALTER TABLE `brands` DISABLE KEYS */;
-/*!40000 ALTER TABLE `brands` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `categories`
---
-
-DROP TABLE IF EXISTS `categories`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `categories` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `categories`
---
-
-LOCK TABLES `categories` WRITE;
-/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
-/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `order_items`
---
-
-DROP TABLE IF EXISTS `order_items`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `order_items` (
-  `order_id` int NOT NULL,
-  `product_id` int NOT NULL,
-  `quantity` int DEFAULT NULL,
-  `price` decimal(13,2) DEFAULT NULL,
-  PRIMARY KEY (`order_id`,`product_id`),
-  KEY `fk_product_id_products_idx` (`product_id`),
-  CONSTRAINT `fk_order_id_orders_items` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`),
-  CONSTRAINT `fk_product_id_products` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `order_items`
---
-
-LOCK TABLES `order_items` WRITE;
-/*!40000 ALTER TABLE `order_items` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order_items` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `orders`
---
-
-DROP TABLE IF EXISTS `orders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orders` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `approved` tinyint DEFAULT NULL,
-  `delivered` tinyint DEFAULT NULL,
-  `total` decimal(13,2) DEFAULT NULL,
-  `user_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `fk_user_id_users_orders_idx` (`user_id`),
-  CONSTRAINT `fk_user_id_users_orders` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `orders`
---
-
-LOCK TABLES `orders` WRITE;
-/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `products`
---
-
-DROP TABLE IF EXISTS `products`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `products` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) DEFAULT NULL,
-  `price` decimal(13,2) DEFAULT NULL,
-  `imagePath` varchar(200) DEFAULT NULL,
-  `brand_id` int DEFAULT NULL,
-  `category_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`),
-  KEY `fk_brand_id_brands_idx` (`brand_id`),
-  KEY `fk_category_id_categories_idx` (`category_id`),
-  CONSTRAINT `fk_brand_id_brands` FOREIGN KEY (`brand_id`) REFERENCES `brands` (`id`),
-  CONSTRAINT `fk_category_id_categories` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `products`
+-- Dumping data for table `classes`
 --
 
-LOCK TABLES `products` WRITE;
-/*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'coca light',10.00,NULL,NULL,NULL),(2,'coca cola normal',NULL,NULL,NULL,NULL),(3,'coca cola zero',NULL,NULL,NULL,NULL);
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
+LOCK TABLES `classes` WRITE;
+/*!40000 ALTER TABLE `classes` DISABLE KEYS */;
+INSERT INTO `classes` VALUES (1,'experiencia de usuario'),(2,'teoria de base datos 2'),(3,'orga de compu');
+/*!40000 ALTER TABLE `classes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `users`
+-- Table structure for table `students`
 --
 
-DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `students`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
+CREATE TABLE `students` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(200) NOT NULL,
-  `salt` varchar(200) NOT NULL,
+  `age` int DEFAULT NULL,
+  `password` varchar(200) DEFAULT NULL,
+  `salt` varchar(200) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
-  UNIQUE KEY `email_UNIQUE` (`email`)
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  UNIQUE KEY `password_UNIQUE` (`password`),
+  UNIQUE KEY `salt_UNIQUE` (`salt`)
+) ENGINE=InnoDB AUTO_INCREMENT=118 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `students`
+--
+
+LOCK TABLES `students` WRITE;
+/*!40000 ALTER TABLE `students` DISABLE KEYS */;
+INSERT INTO `students` VALUES (1,'victor',51,NULL,NULL,NULL),(2,'messi',36,NULL,NULL,NULL),(4,'modric',50,NULL,NULL,NULL),(117,'victor',21,'AHBm8PTA0XbpGbTFZN4ZRUizUdsLv7OcESlCILb1jxzKhLfI68G5/UR3cNyGkva1PaTfUVtF/Xg1hYIpWJWMDQ==','ichbIKBTAFKs/33zbIxWxcBV6rtMy7vKGw+bwJvZVXuJ58Uth8Ug5A0YuHc2alhnWWV1hQf7GnicAeFuTYYJSDUJP5BDTq+8HJnz9egLurNSA9rZGdgFo3UlkIihQ0p1NapLf0IuVfNkycJeDNJYcetGa+fKGqt0E8JqfWs/jso=','victor.ramirez@unitec.edu');
+/*!40000 ALTER TABLE `students` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `students_classes`
+--
+
+DROP TABLE IF EXISTS `students_classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `students_classes` (
+  `student_id` int NOT NULL,
+  `class_id` int NOT NULL,
+  PRIMARY KEY (`student_id`,`class_id`),
+  KEY `fk_class_id_classes_idx` (`class_id`),
+  CONSTRAINT `fk_class_id_classes` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`),
+  CONSTRAINT `fk_student_id_students` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Dumping data for table `students_classes`
 --
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+LOCK TABLES `students_classes` WRITE;
+/*!40000 ALTER TABLE `students_classes` DISABLE KEYS */;
+INSERT INTO `students_classes` VALUES (1,1),(1,2);
+/*!40000 ALTER TABLE `students_classes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -223,4 +110,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-10-25 18:26:15
+-- Dump completed on 2022-11-02 21:15:17
