@@ -4,6 +4,7 @@ const {
     , deleteStudentById: deleteById
     , updateStudent: update
     , createStudent: create,
+    getStudentByEmail,
     register
 } = require("../services/students");
 const { successResponse, badRequestResponse } = require("../utils/responseBuilder");
@@ -11,16 +12,79 @@ const { successResponse, badRequestResponse } = require("../utils/responseBuilde
 const { IsEmail, IsPassword } = require("../utils/validator");
 const crypto = require("crypto");
 
+const jwt = require("jsonwebtoken");
+
 const HTTPCodes = {
     OK: 200,
     CREATED: 201,
     UPDATED: 204,
     BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
     NOT_FOUND: 404,
     INTERNAL_SERVER_ERROR: 500
 };
 
 const { isDecimal } = require("../utils/validator");
+
+async function loginStudent(req, res) {
+    // try catch
+    // validation
+    // action
+    // response
+
+    try {
+        const { email, password } = req.body;
+        const errorMessages = [];
+
+        if (!email) {
+            errorMessages.push("Parameter 'email' is required");
+        } else if (!IsEmail(email)) {
+            errorMessages.push("Parameter 'email' invalid");
+        }
+
+        if (!password) {
+            errorMessages.push("Parameter 'password' is required");
+        } else if (!IsPassword(password)) {
+            errorMessages.push("Parameter 'password' invalid");
+        }
+
+        // action
+        let dbUser = await getStudentByEmail(email);
+        if (dbUser) {
+            dbUser = dbUser[0];
+            const userEncryptedDetails = encryptPassword(password, dbUser.salt);
+            if (userEncryptedDetails.encryptedPassword === dbUser.password) {
+                const accessToken = jwt.sign({
+                    email: dbUser.email,
+                    name: dbUser.name
+                }, process.env.ACCESS_TOKEN_SECRET, {
+                    expiresIn: "1h"
+                });
+
+                // TODO: do we need email?
+                const refreshToken = jwt.sign({
+                    email: dbUser.email
+                }, process.env.REFRESH_TOKEN_SECRET, {
+                    expiresIn: "30d"
+                });
+
+                res.send({
+                    accessToken,
+                    refreshToken
+                });
+            } else {
+                res.status(HTTPCodes.UNAUTHORIZED).send({});
+            }
+
+
+        } else {
+            res.status(404).send("Email does not exist");
+        }
+        console.log(dbUser);
+    } catch (e) {
+
+    }
+}
 
 async function registerStudent(req, res) {
     const { email, password, name, age } = req.body;
@@ -55,8 +119,7 @@ async function registerStudent(req, res) {
         res.status(HTTPCodes.BAD_REQUEST).send(badRequestResponse(errorMessages));
     } else {
         // action
-        const salt = crypto.randomBytes(128).toString('base64');
-        const encryptedPassword = crypto.pbkdf2Sync(password, salt, parseInt(process.env.HASH_ITERATIONS), parseInt(process.env.KEY_LENGTH), "sha256").toString('base64');
+        const { salt, encryptedPassword } = encryptPassword(password);
 
         // call to db
         /*
@@ -76,6 +139,14 @@ async function registerStudent(req, res) {
         const studentId = register(student2);
         res.send(successResponse(studentId));
     }
+}
+
+function encryptPassword(password, salt = crypto.randomBytes(128).toString('base64')) {
+    const encryptedPassword = crypto.pbkdf2Sync(password, salt, parseInt(process.env.HASH_ITERATIONS), parseInt(process.env.KEY_LENGTH), "sha256").toString('base64');
+
+    return {
+        salt, encryptedPassword
+    };
 }
 
 async function getStudents(_, res) {
@@ -177,5 +248,6 @@ module.exports = {
     deleteStudentById,
     updateStudent,
     createStudent,
-    registerStudent
+    registerStudent,
+    loginStudent
 };

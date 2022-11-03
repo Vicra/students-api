@@ -73,6 +73,17 @@ async function getStudentById(id) {
     return student;
 }
 
+async function getStudentByEmail(email) {
+    const student = JSON.parse(
+        JSON.stringify(
+            await knex.select()
+                .table('students')
+                .where('email', email)
+        )
+    );
+    return student;
+}
+
 async function deleteStudentById(id) {
     return await knex('students')
         .where('id', id)
@@ -96,5 +107,6 @@ module.exports = {
     deleteStudentById,
     createStudent,
     updateStudent,
-    register
+    register,
+    getStudentByEmail
 };
